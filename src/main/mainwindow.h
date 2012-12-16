@@ -79,6 +79,8 @@ private:
 
     DownloadManager m_manager;
 
+    QStringList m_listUrls;
+
     /**
      * @brief createConnects
      */

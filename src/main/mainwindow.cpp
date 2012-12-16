@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /// maximized
     //    this->showMaximized();
 
-//    debug();
+    //    debug();
 
 }
 //------------------------------------------------------------------------------
@@ -148,21 +148,27 @@ void MainWindow::slot_download()
 //------------------------------------------------------------------------------
 void MainWindow::slot_addUrlToList()
 {
-    myDebug() << "add url from LE to list";
-//    ui->LEInputUrl->text();
+    //    myDebug() << "add url from LE to list";
+
+    if (!ui->LEInputUrl->text().isEmpty())
+    {
+        m_listUrls << ui->LEInputUrl->text();
+        ui->listUrls->clear();
+        ui->listUrls->addItems(m_listUrls);
+    }
 }
 //------------------------------------------------------------------------------
 void MainWindow::slot_addUrlFromFile()
 {
-//    myDebug() << "add urls from file";
+    //    myDebug() << "add urls from file";
     QFileDialog::Options options;
     QString selectedFilter;
     QString fileName = QFileDialog::getOpenFileName(this,
-                                tr("Select file"),
-                                "",
-                                tr("All Files (*);;Text Files (*.txt)"),
-                                &selectedFilter,
-                                options);
+                                                    tr("Select file"),
+                                                    "",
+                                                    tr("All Files (*);;Text Files (*.txt)"),
+                                                    &selectedFilter,
+                                                    options);
     if (!fileName.isEmpty())
     {
         addUrlFromFile(fileName);
@@ -171,7 +177,9 @@ void MainWindow::slot_addUrlFromFile()
 //------------------------------------------------------------------------------
 void MainWindow::addUrlFromFile(const QString f_fileName)
 {
-    QString t_text = getTextFromHtmlFile(f_fileName);
+    m_listUrls << QString(getTextFromHtmlFile(f_fileName)).split("\n");
+    ui->listUrls->clear();
+    ui->listUrls->addItems(m_listUrls);
 }
 //------------------------------------------------------------------------------
 
