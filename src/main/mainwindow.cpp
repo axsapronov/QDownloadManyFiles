@@ -12,8 +12,7 @@
 
 #include "defines.h" /// defines
 #include "mainwindow.h" ///
-#include "debughelper/debughelper.h"
-#include "downloadmanager.h"
+#include "debughelper.h"
 #include "common.h"
 
 #include <QDesktopWidget> /// moved to center
@@ -38,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
     createTrayIcon(); // add actionts to tray menu
     createConnects(); // moved func
     trIcon->show();  //display tray
-//    fillListModules();
 
 
     /// moved to center desktop
@@ -73,10 +71,13 @@ void MainWindow::createConnects()
     // menu about
     connect(ui->actionAboutAbout, SIGNAL(triggered()), about, SLOT(show()));
     connect(ui->actionAboutAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(ui->actionAboutHomeSite, SIGNAL(triggered()), this, SLOT(aboutOpenSite()));
+    connect(ui->actionAboutHomeSite, SIGNAL(triggered()), this, SLOT(slot_aboutOpenSite()));
 
     // buttons
-    connect(ui->pBBrowseOutputFolder, SIGNAL(clicked()), SLOT(selectOutputFolder()));
+    connect(ui->pBBrowseOutputFolder, SIGNAL(clicked()), SLOT(slot_selectOutputFolder()));
+    connect(ui->pBDownload, SIGNAL(clicked()), SLOT(slot_download()));
+    connect(ui->pBAddUrlsFromFile, SIGNAL(clicked()), SLOT(slot_addUrlFromFile()));
+    connect(ui->pBAddUrl, SIGNAL(clicked()), SLOT(slot_addUrlToList()));
 }
 //------------------------------------------------------------------------------
 void MainWindow::showHide(QSystemTrayIcon::ActivationReason r)
@@ -124,12 +125,12 @@ void MainWindow::createActions()
     connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
 }
 //------------------------------------------------------------------------------
-void MainWindow::aboutOpenSite()
+void MainWindow::slot_aboutOpenSite()
 {
     QDesktopServices::openUrl(QUrl(GL_WEB_SITE));
 }
 //------------------------------------------------------------------------------
-void MainWindow::selectOutputFolder()
+void MainWindow::slot_selectOutputFolder()
 {
     QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
     QString directory = QFileDialog::getExistingDirectory(this
@@ -140,5 +141,37 @@ void MainWindow::selectOutputFolder()
         ui->LEOutputFolder->setText(directory);
 }
 //------------------------------------------------------------------------------
+void MainWindow::slot_download()
+{
+    myDebug() << "start download";
+}
 //------------------------------------------------------------------------------
+void MainWindow::slot_addUrlToList()
+{
+    myDebug() << "add url from LE to list";
+//    ui->LEInputUrl->text();
+}
 //------------------------------------------------------------------------------
+void MainWindow::slot_addUrlFromFile()
+{
+//    myDebug() << "add urls from file";
+    QFileDialog::Options options;
+    QString selectedFilter;
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                tr("Select file"),
+                                "",
+                                tr("All Files (*);;Text Files (*.txt)"),
+                                &selectedFilter,
+                                options);
+    if (!fileName.isEmpty())
+    {
+        addUrlFromFile(fileName);
+    }
+}
+//------------------------------------------------------------------------------
+void MainWindow::addUrlFromFile(const QString f_fileName)
+{
+    QString t_text = getTextFromHtmlFile(f_fileName);
+}
+//------------------------------------------------------------------------------
+

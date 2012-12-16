@@ -3,15 +3,11 @@
 
 
 #include "ui_mainwindow.h"
-
-
 #include "downloadmanager.h"
 #include "about.h" /// aboutdialog
 
-
 #include <QMainWindow>
 #include <QSystemTrayIcon>
-
 
 namespace Ui
 {
@@ -36,11 +32,36 @@ public:
 private slots:
 
     //tray
+    /**
+     * @brief showHide
+     */
     void showHide(QSystemTrayIcon::ActivationReason);
 
-    void aboutOpenSite();
+    /**
+     * @brief slot_aboutOpenSite
+     */
+    void slot_aboutOpenSite();
 
-    void selectOutputFolder();
+    /**
+     * @brief slot_selectOutputFolder
+     */
+    void slot_selectOutputFolder();
+
+    /**
+     * @brief slot_download
+     */
+    void slot_download();
+
+    /**
+     * @brief slot_addUrlFromFile
+     */
+    void slot_addUrlFromFile();
+
+    /**
+     * @brief slot_addUrlToList
+     */
+    void slot_addUrlToList();
+
 
 private:
     Ui::MainWindow *ui;
@@ -74,6 +95,8 @@ private:
      * @brief debug
      */
     void debug();
+
+    void addUrlFromFile(const QString f_fileName);
 
 
 };
