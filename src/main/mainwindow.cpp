@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /// maximized
     //    this->showMaximized();
 
-    //    debug();
+    //        debug();
 
 }
 //------------------------------------------------------------------------------
@@ -57,7 +57,12 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------
 void MainWindow::debug()
 {
-
+    QStringList t_test;
+    t_test << "http://www.google.ru"
+           << "http://www.yandex.ru"
+           << "http://www.gismeteo.ru/";
+    //    m_manager.setOutputFolder("/home/files/Develop/git/QDownloadManyFiles/build/build/bin/test/");
+    m_manager.append(t_test);
 }
 //------------------------------------------------------------------------------
 void MainWindow::createConnects()

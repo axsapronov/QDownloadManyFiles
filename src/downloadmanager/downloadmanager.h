@@ -57,17 +57,55 @@ class DownloadManager: public QObject
 public:
     DownloadManager(QObject *parent = 0);
 
+    /**
+     * @brief append
+     * @param url
+     */
     void append(const QUrl &url);
+
+    /**
+     * @brief append
+     * @param urlList
+     */
     void append(const QStringList &urlList);
+
+    /**
+     * @brief saveFileName
+     * @param url
+     * @return
+     */
     QString saveFileName(const QUrl &url);
+
+    /**
+     * @brief setOutputFolder
+     * @param folder
+     */
+    void setOutputFolder(const QString folder);
 
 signals:
     void finished();
 
 private slots:
+    /**
+     * @brief startNextDownload
+     */
     void startNextDownload();
+
+    /**
+     * @brief downloadProgress
+     * @param bytesReceived
+     * @param bytesTotal
+     */
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+
+    /**
+     * @brief downloadFinished
+     */
     void downloadFinished();
+
+    /**
+     * @brief downloadReadyRead
+     */
     void downloadReadyRead();
 
 private:
@@ -80,6 +118,7 @@ private:
 
     int downloadedCount;
     int totalCount;
+    QString m_outputFolder;
 };
 
 #endif

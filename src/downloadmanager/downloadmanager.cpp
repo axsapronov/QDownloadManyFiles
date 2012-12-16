@@ -40,6 +40,7 @@
 ****************************************************************************/
 
 #include "downloadmanager.h"
+#include "debughelper.h"
 
 #include <QFileInfo>
 #include <QNetworkRequest>
@@ -52,8 +53,10 @@
 DownloadManager::DownloadManager(QObject *parent)
     : QObject(parent), downloadedCount(0), totalCount(0)
 {
-}
 
+    m_outputFolder = "";
+}
+//------------------------------------------------------------------------------
 void DownloadManager::append(const QStringList &urlList)
 {
     foreach (QString url, urlList)
@@ -62,7 +65,7 @@ void DownloadManager::append(const QStringList &urlList)
     if (downloadQueue.isEmpty())
         QTimer::singleShot(0, this, SIGNAL(finished()));
 }
-
+//------------------------------------------------------------------------------
 void DownloadManager::append(const QUrl &url)
 {
     if (downloadQueue.isEmpty())
@@ -71,19 +74,20 @@ void DownloadManager::append(const QUrl &url)
     downloadQueue.enqueue(url);
     ++totalCount;
 }
-
+//------------------------------------------------------------------------------
 QString DownloadManager::saveFileName(const QUrl &url)
 {
     QString path = url.path();
-    QString basename = QFileInfo(path).fileName();
+    QString basename = m_outputFolder + QFileInfo(path).fileName();
 
     if (basename.isEmpty())
-        basename = "download";
+        basename = m_outputFolder + "download";
 
-    if (QFile::exists(basename)) {
+    if (QFile::exists(basename))
+    {
         // already exists, don't overwrite
         int i = 0;
-        basename += '.';
+        basename = m_outputFolder + "download" + '.';
         while (QFile::exists(basename + QString::number(i)))
             ++i;
 
@@ -92,10 +96,11 @@ QString DownloadManager::saveFileName(const QUrl &url)
 
     return basename;
 }
-
+//------------------------------------------------------------------------------
 void DownloadManager::startNextDownload()
 {
-    if (downloadQueue.isEmpty()) {
+    if (downloadQueue.isEmpty())
+    {
         printf("%d/%d files downloaded successfully\n", downloadedCount, totalCount);
         emit finished();
         return;
@@ -105,7 +110,8 @@ void DownloadManager::startNextDownload()
 
     QString filename = saveFileName(url);
     output.setFileName(filename);
-    if (!output.open(QIODevice::WriteOnly)) {
+    if (!output.open(QIODevice::WriteOnly))
+    {
         fprintf(stderr, "Problem opening save file '%s' for download '%s': %s\n",
                 qPrintable(filename), url.toEncoded().constData(),
                 qPrintable(output.errorString()));
@@ -127,7 +133,7 @@ void DownloadManager::startNextDownload()
     printf("Downloading %s...\n", url.toEncoded().constData());
     downloadTime.start();
 }
-
+//------------------------------------------------------------------------------
 void DownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
     progressBar.setStatus(bytesReceived, bytesTotal);
@@ -135,12 +141,17 @@ void DownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
     // calculate the download speed
     double speed = bytesReceived * 1000.0 / downloadTime.elapsed();
     QString unit;
-    if (speed < 1024) {
+    if (speed < 1024)
+    {
         unit = "bytes/sec";
-    } else if (speed < 1024*1024) {
+    }
+    else if (speed < 1024*1024)
+    {
         speed /= 1024;
         unit = "kB/s";
-    } else {
+    }
+    else
+    {
         speed /= 1024*1024;
         unit = "MB/s";
     }
@@ -149,16 +160,19 @@ void DownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
                            .arg(speed, 3, 'f', 1).arg(unit));
     progressBar.update();
 }
-
+//------------------------------------------------------------------------------
 void DownloadManager::downloadFinished()
 {
     progressBar.clear();
     output.close();
 
-    if (currentDownload->error()) {
+    if (currentDownload->error())
+    {
         // download failed
         fprintf(stderr, "Failed: %s\n", qPrintable(currentDownload->errorString()));
-    } else {
+    }
+    else
+    {
         printf("Succeeded.\n");
         ++downloadedCount;
     }
@@ -166,8 +180,14 @@ void DownloadManager::downloadFinished()
     currentDownload->deleteLater();
     startNextDownload();
 }
-
+//------------------------------------------------------------------------------
 void DownloadManager::downloadReadyRead()
 {
     output.write(currentDownload->readAll());
 }
+//------------------------------------------------------------------------------
+void DownloadManager::setOutputFolder(const QString folder)
+{
+    m_outputFolder = folder;
+}
+//------------------------------------------------------------------------------
